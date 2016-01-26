@@ -89,7 +89,7 @@ def learn_while(train,tests):
         tmp = learn(train,1,tmp)
         errorRate = test(tests,tmp)
         if(errorRate == 0):
-            print("le progamme a converge en ",count, " taux d erreur : " , errorRate)
+            print("le progamme a converge en ",count
             return tmp
     print("le programme pas pu converger")
     return tmp
