@@ -70,19 +70,21 @@ def test(corpus,poids):
     for s in corpus:
         (value,elements) = s
         if not classify(elements,poids)== value:
-            erreur +=1
+            erreur +=1.0
     return erreur/len(corpus)
 
 
-def learn(train):
+def learn(train,nb):
     poids = [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    for (value,elements) in train:
-        if(not classify(elements,poids) == value):
-            poids = poids + np.dot(elements,value)
+    for s in range(1,nb+1): 
+        for (value,elements) in train:
+            if(not classify(elements,poids) == value):
+                poids = poids + np.dot(elements,value)
     return poids
     
 
 print(test(tests,[25,-12, 67, -104, -43, 46, -18, -10, 45, -33, 54, -39, 43, -19, 5, -2, 55]))           
-mon_poids = learn(data)
+mon_poids = learn(train,50)
+print(mon_poids)
 print(test(tests,mon_poids))  
         
