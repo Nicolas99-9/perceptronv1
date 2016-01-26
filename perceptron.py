@@ -81,17 +81,17 @@ def learn(train,nb,poids):
                 poids = poids + np.dot(elements,value)
     return poids
     
-def learn_while(train,tests):
+def learn_while(train,tests,nb):
     count = 0
-    tmp = [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    while(count<125000):
+    tmp = [0 for i in range(nb)]
+    while(count<50000):
         count+=1
         tmp = learn(train,1,tmp)
         errorRate = test(tests,tmp)
         if(errorRate == 0):
             print("le progamme a converge en ",count, " taux d erreur : " , errorRate)
             return tmp
-    print("le programme pas pu converger")
+    print("le programme pas pu converger, taux d'erreur obtenu :", errorRate)
     return tmp
 
     
@@ -99,4 +99,48 @@ def learn_while(train,tests):
 #mon_poids = learn(train,50)
 #print(mon_poids)
 #print(test(tests,mon_poids,[0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))  
-print(learn_while(train,tests))       
+print(learn_while(train,tests,17))       
+
+
+#---------------------------------------- Spam ---------------------------------
+data2 = spam_reader("spambase.data")
+
+def getRandom(data):
+    random.seed(100)
+    random.shuffle(data)
+    train = data[:3600]
+    test = data[:len(data)-3600]
+    return (train,test)
+
+(train2,tests2) = getRandom(data2) 
+print("Nombre d erreurs pour le spam (taux en %)")
+mon_poids2 = learn(train2,1,[0 for i in range(58)])
+print("Valeurs des poids w du perceptron : ",mon_poids2)
+print(test(tests2,mon_poids2))  
+print("apres plusieurs appprentissages : ")
+print(learn_while(train2,tests2,58)) 
+
+
+#------------------------------------- Learn with a bias ------------------------
+
+
+def learn_biais(train,nb,poids,b):
+    for s in range(1,nb+1): 
+        for (value,elements) in train:
+            if(not classify(elements,poids) == value):
+                tmp = np.dot(elements,value)
+                poids = poids + np.dot(tmp,b)
+    return poids
+    
+def learn_biais(train,tests,nb):
+    count = 0
+    tmp = [0 for i in range(nb)]
+    while(count<50000):
+        count+=1
+        tmp = learn(train,1,tmp)
+        errorRate = test(tests,tmp)
+        if(errorRate == 0):
+            print("le progamme a converge en ",count, " taux d erreur : " , errorRate)
+            return tmp
+    print("le programme pas pu converger, taux d'erreur obtenu :", errorRate)
+    return tmp
