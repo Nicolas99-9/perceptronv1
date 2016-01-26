@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 def data_reader(filename):
     to_binary = {"?": 3, "y": 2, "n": 1}
@@ -84,7 +85,9 @@ def learn(train,nb,poids):
 def learn_while(train,tests,nb):
     count = 0
     tmp = [0 for i in range(nb)]
-    while(count<50000):
+    while(count<5000):
+        if(count%100==0):
+            print(count)
         count+=1
         tmp = learn(train,1,tmp)
         errorRate = test(tests,tmp)
@@ -99,7 +102,7 @@ def learn_while(train,tests,nb):
 #mon_poids = learn(train,50)
 #print(mon_poids)
 #print(test(tests,mon_poids,[0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))  
-print(learn_while(train,tests,17))       
+#print(learn_while(train,tests,17))       
 
 
 #---------------------------------------- Spam ---------------------------------
@@ -113,13 +116,14 @@ def getRandom(data):
     return (train,test)
 
 (train2,tests2) = getRandom(data2) 
+'''
 print("Nombre d erreurs pour le spam (taux en %)")
 mon_poids2 = learn(train2,1,[0 for i in range(58)])
 print("Valeurs des poids w du perceptron : ",mon_poids2)
 print(test(tests2,mon_poids2))  
 print("apres plusieurs appprentissages : ")
 print(learn_while(train2,tests2,58)) 
-
+'''
 
 #------------------------------------- Learn with a bias ------------------------
 
@@ -128,19 +132,41 @@ def learn_biais(train,nb,poids,b):
     for s in range(1,nb+1): 
         for (value,elements) in train:
             if(not classify(elements,poids) == value):
-                tmp = np.dot(elements,value)
-                poids = poids + np.dot(tmp,b)
+                poids = poids + np.dot(np.dot(elements,value),b)
     return poids
     
-def learn_biais(train,tests,nb):
+def learn_while_biais(trainss,testsss,nb,b):
     count = 0
     tmp = [0 for i in range(nb)]
-    while(count<50000):
+    print("value rde b :",b)
+    while(count<5000):
         count+=1
-        tmp = learn(train,1,tmp)
-        errorRate = test(tests,tmp)
+        tmp = learn_biais(trainss,1,tmp,b)
+        errorRate = test(testsss,tmp)
         if(errorRate == 0):
             print("le progamme a converge en ",count, " taux d erreur : " , errorRate)
             return tmp
     print("le programme pas pu converger, taux d'erreur obtenu :", errorRate)
-    return tmp
+    return (tmp,errorRate)
+
+
+def compute_for_senator(trainss,testsss,taille,filename):
+    nb = [i*0.10 for i in range(1,11)]
+    tab1 = []
+    tab2 = []
+    for val in nb:
+        print("debug : ",val)
+        _,s = learn_while_biais(trainss,testsss,taille,val)
+        tab1.append(val)
+        tab2.append(s)
+    plt.plot(tab1, tab2)
+    plt.xlabel('parameter')
+    plt.ylabel('error rate(%)')
+    plt.title('A simple perceptron')
+    plt.savefig(filename)
+    plt.show()
+    
+#compute_for_senator(train,tests,17,"test.png")
+
+compute_for_senator(train2,tests2,58,"test-spam.png")
+ 
